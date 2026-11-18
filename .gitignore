@@ -8,3 +8,5 @@ __pycache__/
 *.parquet
 results/maps/trip_00000033.html
 results/maps/trip_00000076.html
+results/maps/trip_00000033.html
+results/maps/trip_00000076.html
