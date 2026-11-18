@@ -21,9 +21,18 @@ def _arc_lines(trip, arc_ids):
     return [[(nd.lat.values[a], nd.lon.values[a]), (nd.lat.values[b], nd.lon.values[b])] for a, b in zip(u, v)]
 
 
-def make_trip_map(trip, predicted_arcs=None, out_html=None, net_radius_m=120, max_net_arcs=15000, max_gps=4000):
+BASEMAPS = {  # OSM blocks file:// pages (403) and CARTO now needs an API key, so default to Esri; None = no tiles
+    "esri": ("Esri street map", "https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}", "Tiles &copy; Esri"),
+    "osm": ("OpenStreetMap", "https://tile.openstreetmap.org/{z}/{x}/{y}.png", "&copy; OpenStreetMap contributors"),
+}
+
+
+def make_trip_map(trip, predicted_arcs=None, out_html=None, net_radius_m=120, max_net_arcs=15000, max_gps=4000, basemap="esri"):
     tr = trip["track"]
-    m = folium.Map(location=[tr.lat.mean(), tr.lon.mean()], zoom_start=15, tiles="OpenStreetMap", control_scale=True)
+    m = folium.Map(location=[tr.lat.mean(), tr.lon.mean()], zoom_start=15, tiles=None, control_scale=True, max_zoom=19)
+    if basemap in BASEMAPS:
+        n, url, attr = BASEMAPS[basemap]
+        folium.TileLayer(tiles=url, attr=attr, name=n, max_native_zoom=18, max_zoom=19).add_to(m)
     # network near the track
     proj = LocalProj.for_trip(trip)
     ax, ay, bx, by = arc_xy(trip, proj)
@@ -35,11 +44,11 @@ def make_trip_map(trip, predicted_arcs=None, out_html=None, net_radius_m=120, ma
     if len(near) > max_net_arcs:
         near = near[np.linspace(0, len(near) - 1, max_net_arcs).astype(int)]
     g = folium.FeatureGroup("Road network", show=True)
-    folium.PolyLine(_arc_lines(trip, near), color="#888", weight=1, opacity=0.7).add_to(g); g.add_to(m)
+    folium.PolyLine(_arc_lines(trip, near), color="#555", weight=1.5, opacity=0.8).add_to(g); g.add_to(m)
     # reference route
     if trip.get("route") is not None:
         g = folium.FeatureGroup("Reference route", show=True)
-        folium.PolyLine(_arc_lines(trip, trip["route"].arc_id.values), color="#2ca02c", weight=4, opacity=0.8).add_to(g); g.add_to(m)
+        folium.PolyLine(_arc_lines(trip, trip["route"].arc_id.values), color="#2ca02c", weight=8, opacity=0.55).add_to(g); g.add_to(m)
     # predicted route
     if predicted_arcs is not None:
         g = folium.FeatureGroup("Predicted route", show=True)
