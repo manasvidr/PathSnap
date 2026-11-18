@@ -1,7 +1,6 @@
 numpy
 pandas
 scipy
-scikit-learn
 shapely>=2.0
 networkx
 folium
