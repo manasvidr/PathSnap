@@ -3,14 +3,15 @@
 Candidate columns: trip_id, point_idx, arc_id, dist_m, proj_frac, rank, n_cand_in_radius, label (0/1).
 points_*: one row per GPS point (ref_arc, ref_dist_m, in_candidates) -> candidate miss rate.
 Labels exist only for building train/dev data; the API must call generate_candidates() WITHOUT labels."""
-import sys, time, numpy as np, pandas as pd
+import json, sys, time, numpy as np, pandas as pd
 from _common import RESULTS, PROCESSED
 from src.io_utils import PARTITIONS, list_trips, load_trip
 from src.candidates import build_index, generate_candidates
 from src.labels import label_points, reference_quality
+from src.config import CAND_RADIUS_M, CAND_K, SEED, SUSPECT_MEDIAN_M
 
-R = float(sys.argv[1]) if len(sys.argv) > 1 else 80.0
-K = int(sys.argv[2]) if len(sys.argv) > 2 else 15
+R = float(sys.argv[1]) if len(sys.argv) > 1 else CAND_RADIUS_M
+K = int(sys.argv[2]) if len(sys.argv) > 2 else CAND_K
 qrows = []
 for part in PARTITIONS:
     C, P, t0 = [], [], time.time()
@@ -30,3 +31,6 @@ for part in PARTITIONS:
     P.to_parquet(f"{PROCESSED}/points_{part}.parquet", index=False)
     print(f"{part}: {len(C):,} rows, positives {C.label.mean():.3f}, miss {1-P.in_candidates.mean():.4f}, {time.time()-t0:.0f}s")
 pd.DataFrame(qrows).to_csv(f"{RESULTS}/trip_reference_quality.csv", index=False)
+import os
+os.makedirs(os.path.join(os.path.dirname(RESULTS), "artifacts"), exist_ok=True)
+json.dump(dict(radius_m=R, k=K, seed=SEED, suspect_median_m=SUSPECT_MEDIAN_M), open(os.path.join(os.path.dirname(RESULTS), "artifacts", "candidate_config.json"), "w"), indent=2)

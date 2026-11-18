@@ -4,8 +4,8 @@ import numpy as np
 import networkx as nx
 from .geo import haversine
 
-SPEED_LIMIT = 70.0   # m/s, plan threshold for 'impossible' jumps
-GAP_SPLIT_S = 10     # seconds; matches the HMM gap threshold proposed in the plan
+from .config import GAP_SPLIT_S
+SPEED_LIMIT = 70.0   # m/s, plan threshold for "impossible" jumps
 
 
 def trip_quality(trip, root):

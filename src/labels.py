@@ -8,7 +8,7 @@ import numpy as np
 import pandas as pd
 from .geo import LocalProj, arc_xy, point_segment_dist
 
-SUSPECT_MEDIAN_M = 30.0  # median point-to-label distance above this => reference route inconsistent with the GPS
+from .config import SUSPECT_MEDIAN_M  # median point-to-label distance above this => reference inconsistent with GPS
 
 
 def label_points(trip, proj=None):

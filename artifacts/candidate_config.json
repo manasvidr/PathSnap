@@ -1,0 +1,6 @@
+{
+  "radius_m": 80.0,
+  "k": 15,
+  "seed": 42,
+  "suspect_median_m": 30.0
+}
