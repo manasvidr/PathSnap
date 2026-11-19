@@ -193,3 +193,7 @@ PathSnap demonstrates how machine-learning classification and road-network-aware
 Histogram Gradient Boosting achieved the highest cross-validation macro F1 score among the evaluated classifiers. HMM/Viterbi decoding improved road continuity overall, although pointwise prediction accuracy decreased slightly on average.
 
 The project highlights the importance of combining classification performance with road-network constraints when reconstructing vehicle trajectories.
+
+## 16. Submission Note
+
+The README describes the modules currently present in this repository. The complete project implementation should be checked against the final submission before running additional experiments.
